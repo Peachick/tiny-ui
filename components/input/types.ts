@@ -19,7 +19,7 @@ export interface InputProps
 
 export interface InputGroupProps
   extends BaseProps,
-    React.PropsWithoutRef<JSX.IntrinsicElements['div']> {
+    React.PropsWithRef<JSX.IntrinsicElements['div']> {
   size?: SizeType;
   disabled?: boolean;
   children: React.ReactElement;
@@ -27,7 +27,7 @@ export interface InputGroupProps
 
 export interface InputGroupAddonProps
   extends BaseProps,
-    React.PropsWithoutRef<JSX.IntrinsicElements['div']> {
+    React.PropsWithRef<JSX.IntrinsicElements['div']> {
   noBorder: boolean;
   disabled?: boolean;
   size?: SizeType;
