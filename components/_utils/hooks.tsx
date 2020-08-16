@@ -55,3 +55,19 @@ export function useDebounce<T>(value: T, delay = 300): [T] {
 
   return [debouncedValue];
 }
+
+/**
+ * Use a local ref and also support an external ref by using React.forwardRef.
+ * @param refs 
+ */
+export function useMergeRefs<T = any>(...refs: Array<React.MutableRefObject<T> | React.LegacyRef<T>>): React.RefCallback<T> {
+  return (value) => {
+    refs.forEach((ref) => {
+      if (typeof ref === "function") {
+        ref(value);
+      } else if (ref != null) {
+        (ref as React.MutableRefObject<T | null>).current = value;
+      }
+    });
+  };
+}
