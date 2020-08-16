@@ -5,7 +5,7 @@ import { getPrefixCls } from '../_utils/general';
 import { InputGroupProps, InputProps } from './types';
 import { SizeType } from '../_utils/props';
 
-const InputGroup = (props: InputGroupProps): React.ReactElement => {
+const InputGroup = React.forwardRef<HTMLDivElement, InputGroupProps>((props: InputGroupProps, ref): React.ReactElement => {
   const {
     disabled = false,
     size = 'md',
@@ -20,7 +20,7 @@ const InputGroup = (props: InputGroupProps): React.ReactElement => {
   const inputSize = props.size || configContext.componentSize || size;
 
   return (
-    <div {...otherProps} className={cls}>
+    <div {...otherProps} ref={ref} className={cls}>
       {React.Children.map(children, (child: React.ReactElement) => {
         const childProps: Partial<InputProps> = {
           disabled,
@@ -30,7 +30,7 @@ const InputGroup = (props: InputGroupProps): React.ReactElement => {
       })}
     </div>
   );
-};
+});
 
 InputGroup.displayName = 'InputGroup';
 

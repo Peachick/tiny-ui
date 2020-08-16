@@ -5,7 +5,7 @@ import { getPrefixCls } from '../_utils/general';
 import { InputGroupAddonProps, InputProps } from './types';
 import { SizeType } from '../_utils/props';
 
-const InputGroupAddon = (props: InputGroupAddonProps): React.ReactElement => {
+const InputGroupAddon = React.forwardRef<HTMLDivElement, InputGroupAddonProps>((props: InputGroupAddonProps, ref): React.ReactElement => {
   const {
     disabled = false,
     size = 'md',
@@ -41,7 +41,7 @@ const InputGroupAddon = (props: InputGroupAddonProps): React.ReactElement => {
       {children}
     </div>
   );
-};
+});
 
 InputGroupAddon.displayName = 'InputGroupAddon';
 
