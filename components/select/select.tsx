@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
+import React, { useContext, useEffect, useRef, useState, useLayoutEffect } from 'react';
 import classNames from 'classnames';
-import { useClickOutside } from '../_utils/hooks';
+import { useClickOutside, useMergeRefs } from '../_utils/hooks';
 import { ArrowDown } from '../_utils/components';
 import { SelectContext } from './select-context';
 import { ConfigContext } from '../config-provider/config-context';
@@ -9,7 +9,7 @@ import { SelectOptionsProps, SelectProps, SelectValue } from './types';
 import Popup from '../popup';
 import Input from '../input/input';
 
-const Select = (props: SelectProps): React.ReactElement => {
+const Select = React.forwardRef<HTMLDivElement, SelectProps>((props: SelectProps, ref): React.ReactElement => {
   const {
     defaultOpen = false,
     disabled = false,
@@ -26,14 +26,16 @@ const Select = (props: SelectProps): React.ReactElement => {
   } = props;
   const [isOpenDropdown, setIsOpenDropdown] = useState('open' in props ? props.open : defaultOpen);
   const [selectVal, setSelectVal] = useState('value' in props ? value : defaultValue);
-  const ref = useRef<HTMLDivElement | null>(null);
+  const [popupWidth, setPopupWidth] = useState<number>(0);
+  const innerRef = useRef<HTMLDivElement | null>(null);
+  const mergeRef = useMergeRefs<HTMLDivElement | null>(ref, innerRef);
   const configContext = useContext(ConfigContext);
   const prefixCls = getPrefixCls('select', configContext.prefixCls, customisedCls);
   const cls = classNames(prefixCls, className);
   const arrowCls = classNames(`${prefixCls}__arrow`, {
     [`${prefixCls}__arrow_reverse`]: isOpenDropdown,
   });
-  useClickOutside(ref.current as HTMLDivElement, () => {
+  useClickOutside(innerRef.current as HTMLDivElement, () => {
     if (!('open' in props)) {
       setIsOpenDropdown(false);
       onDropdownVisibleChange && onDropdownVisibleChange(false);
@@ -61,6 +63,14 @@ const Select = (props: SelectProps): React.ReactElement => {
     'open' in props && setIsOpenDropdown(props.open);
   }, [props]);
 
+  useLayoutEffect(() => {
+    const node = innerRef.current;
+    if (node) {
+      const rect = node.getBoundingClientRect();
+      setPopupWidth(rect.width);
+    }
+  }, []);
+
   const renderOverlay = (): React.ReactElement => (
     <SelectContext.Provider value={contextValue}>
       <ul className={`${prefixCls}__dropdown`} style={dropdownStyle}>
@@ -81,11 +91,13 @@ const Select = (props: SelectProps): React.ReactElement => {
   );
 
   return (
-    <div {...otherProps} ref={ref} className={cls}>
+    <div {...otherProps} ref={mergeRef} className={cls}>
       <Popup
+        style={{ width: popupWidth }}
         trigger="manual"
         placement="bottom"
         arrow={false}
+        biZoom={false}
         visible={isOpenDropdown}
         content={renderOverlay()}>
         <Input
@@ -102,7 +114,7 @@ const Select = (props: SelectProps): React.ReactElement => {
       </Popup>
     </div>
   );
-};
+});
 
 Select.displayName = 'Select';
 
